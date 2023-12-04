@@ -1,5 +1,8 @@
+// Form.js
 import React, { useState, useEffect } from "react";
 import { nanoid } from "nanoid";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
 export default function Form(props) {
   const [item, setItem] = useState("");
@@ -27,7 +30,7 @@ export default function Form(props) {
         const newItem = {
           item: item,
           id: nanoid(),
-          played: false
+          played: false,
         };
         props.addList(newItem);
         setItem("");
@@ -36,17 +39,18 @@ export default function Form(props) {
   }
 
   return (
-    <div className="edit">
-      <form onSubmit={handleSubmit}>
-        <label>
-          <input
-            type="text"
-            placeholder="Add new task..."
-            onChange={handleItemChange}
-            value={item}
-          />
-        </label>
-        <button type="submit">Add</button>
+    <div className="form-container">
+      <form className="form" onSubmit={handleSubmit}>
+        <TextField
+          id="outlined-basic"
+          variant="outlined"
+          onChange={handleItemChange}
+          value={item}
+          placeholder="Add new task..."
+        />
+        <Button type="submit" variant="contained" color="success">
+          Add
+        </Button>
       </form>
     </div>
   );

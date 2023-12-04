@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import Form from "./Form";
 import Item from "./Item";
+import Button from "@mui/material/Button";
 
 export default function TodoList() {
   const [items, setItems] = useState([]);
   const [editingItemId, setEditingItemId] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   function addItem(item) {
-    const updatedList = [...items, item];
+    const updatedList = [...items, { ...item, startTime: new Date() }];
     setItems(updatedList);
+    setIsAdding(false);
   }
 
   function removeItem(track) {
@@ -22,6 +25,11 @@ export default function TodoList() {
     const updatedItems = items.map(function (item) {
       if (item.id === track.id) {
         item.played = !item.played;
+        if (item.played) {
+          item.completedTime = new Date();
+        } else {
+          item.completedTime = null;
+        }
       }
       return item;
     });
@@ -38,13 +46,21 @@ export default function TodoList() {
     });
 
     setItems(updatedItems);
-    setEditingItemId(null);
   }
 
+  const handleAddClick = () => {
+    setIsAdding(true);
+    setEditingItemId(null);
+  };
+
+  const handleEditClick = (itemId) => {
+    setIsAdding(true);
+    setEditingItemId(itemId);
+  };
+
   return (
-    <div>
-      <h1>Task Management App</h1>
-      {editingItemId === null ? (
+    <div className="items-stack">
+      {editingItemId === null && !isAdding && (
         <ul>
           {items.map((item) => (
             <Item
@@ -52,20 +68,32 @@ export default function TodoList() {
               name={item}
               remove={removeItem}
               togglePlayed={togglePlayed}
-              setEditingItemId={setEditingItemId}
+              setEditingItemId={handleEditClick}
               edit={editItem}
             />
           ))}
         </ul>
-      ) : null}
+      )}
 
-      <Form
-        addList={addItem}
-        editingItemId={editingItemId}
-        editItem={editItem}
-        setEditingItemId={setEditingItemId}
-        items={items}
-      />
+      {isAdding && (
+        <Form
+          addList={addItem}
+          editingItemId={editingItemId}
+          editItem={(itemId, editedText) => {
+            editItem(itemId, editedText);
+            setIsAdding(false);
+            setEditingItemId(null);
+          }}
+          setEditingItemId={setEditingItemId}
+          items={items}
+        />
+      )}
+
+      {!isAdding && (
+        <Button onClick={handleAddClick} variant="contained" color="success">
+          Add TASK
+        </Button>
+      )}
     </div>
   );
 }
